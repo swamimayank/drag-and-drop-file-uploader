@@ -1,0 +1,105 @@
+Its always a good idea to give user facility to upload file by just drag and drop. In this article i will show you how to create Drag and drop file upload with php and creating thumbnail too.
+
+In this article we will use <a href="http://www.dropzonejs.com" >dropzonejs</a> for creating drag and drop form, We are using dropzonejs because its quite easy to integrate and simple and i really dont want to reinvent wheel. Ill show you how to do that.
+
+Download and include <code>dropzone.css</code> and <code>dropzone.js</code> to your code page.
+
+now Create your file and include this form for example i have create upload.html 
+
+<code><form action="uploadHandler.php" class="dropzone"></form></code>
+
+Now add JavaScript of dropzone and call it by following code .
+
+<code>    Dropzone.options.myAwesomeDropzone = {
+        paramName: "file", // The name that will be used to transfer the file
+        maxFilesize: 20, // MB
+        dictDefaultMessage: "Drop files here or click to upload",
+
+        accept: function (file, done) {
+            if (file.name == "justinbieber.jpg") {
+                done("Naha, you don't.");
+            }
+            else {
+                done();
+            }
+        }
+    };</code>
+
+Not sure why but some time if options here doesnt work just go to dropzone.js file and edit them directly there.
+
+
+So you have just complete setting up your drag and drop file uploader with html, js now its time to grab file to server and upload it , and make database entry about file information.
+
+you can upload any file you want but in this article  ill show you how to upload and save image file.
+
+<code>
+$uploa_dir = "image/";
+
+if (!empty($_FILES)  ) {
+    $access = FALSE;
+    $file_name = $_FILES['file']['name'];
+
+    $image_extantion = pathinfo($file_name, PATHINFO_EXTENSION);
+    $whitelist = array(".jpeg", ".jpg", ".png");
+    foreach ($whitelist as $item) {
+
+        if (preg_match("/$item\$/i", $file_name)) {
+           
+            /*change file name /*
+            $new_file_name = sha1(alphanumeric_token(4)) . "-" . time(); 
+
+            $access = True;
+            $uploadfile = $uploa_dir . $new_file_name . "." . $image_extantion;
+            
+
+        }
+    }
+
+       if ($access) {
+
+        if ( getimagesize($_FILES['file']['tmp_name']) || !file_exists($uploadfile)) {
+
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) {
+                 
+                if (file_exists($uploadfile)  ) {
+
+                     /** you can make database query here and to upload information about file like *
+                       *
+                       * $query = $db->prepare("INSERT INTO album_images(image_name, image_album_id) VALUE (:imageName,:albumId)");
+                       * $query->execute(array(":imageName" => $imageName, ":albumId" => $ablumId));
+                       *  ...                                                                   
+                       */
+
+                     logger ("successful uploaded " .$file_name."-----".$uploadfile);
+                }
+            }else{
+                logger("error".$file_name." not moved");
+            }
+        }else{
+            logger("error ".$file_name."not found {$_FILES["file"]["error"]}-----".implode($_FILES["file"]) ."--------file exists..".file_exists($uploadfile)."---".implode(getimagesize($_FILES['file']['tmp_name'])));
+        }
+    }else{
+        logger("error ".$file_name." access not {$access}");
+    }
+
+
+}
+
+function logger($str = ''){
+    $file = 'log.txt';
+    $current = file_get_contents($file);
+    file_put_contents($file, $str.PHP_EOL , FILE_APPEND);
+}
+
+
+function alphanumeric_token($length){
+    $characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    $string = '';
+    for ($i = 0; $i < $length; $i++) {
+        $string .= $characters[rand(0, strlen($characters) - 1)];
+    }
+    return $string;
+}
+</code>
+
+Now what all you

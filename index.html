@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	 <title>Drag and drop file upload with php</title>
+	 <link rel="stylesheet" href="dropzone.css">
+</head>
+<body>
+     <form action="uploadHandler.php" class="dropzone image-uploader"></form>
+
+     <script src="dropzone.js"></script>
+	 <script type="text/javascript">
+	    $(document).ready(function () {
+	 
+	    Dropzone.options.myAwesomeDropzone = {
+	        paramName: "file", // The name that will be used to transfer the file
+	        maxFilesize: 20, // MB
+	        dictDefaultMessage: "Drop files here or click to upload",
+			parallelUploads: 1,
+	        accept: function (file, done) {
+	            if (file.name == "justinbieber.jpg") {
+	                done("Naha, you don't.");
+	            }
+	            else {
+	                done();
+	            }
+	        }
+	    };
+	</script>
+
+
+</body>
+</html>
+
